@@ -1,0 +1,154 @@
+<div class="container-fluid">
+
+          <!-- Breadcrumbs-->
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#">Face Detect From URL</a>
+            </li>
+            <!-- <li class="breadcrumb-item active">Overview</li> -->
+          </ol>
+
+          <!-- Icon Cards-->
+
+          <div class="row">
+            <div class="col-xl-6 col-sm-9 mb-6">
+              
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="name">Subscription Key</label>
+                        <input  class="form-control" value="88e4100823d649138e0cd86d9b16ad0f" type="text" id="subkey" placeholder="Subscription Key">
+                    </div>
+                </div>
+    
+    
+                <div class="col-md-12">
+                    <div class="form-group" id="reqparam1">
+                        <label for="name">Requested Parameter</label>
+                        <textarea class="form-control" style="height:130px"  type="text" id="reqparam" placeholder="">returnFaceId=true&returnFaceLandmarks=false&returnFaceAttributes=age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise
+                        </textarea>
+                    </div>
+                </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="name">Input Parameter</label>
+                            <textarea class="form-control" style="height:130px" type="text" id="bodyparam" placeholder="">
+    {
+            "url":"https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260"
+    }    
+                            </textarea>
+                        </div>
+                    </div>    
+    
+    
+                    <button class="btn btn-secondary col-md-2" style="margin-left: 15px;" type="button" onclick="detectface()">Analyze</button>
+    
+ 
+
+            </div>
+            <div class="col-xl-6 col-sm-9 mb-6">
+                <canvas id="outcan" width="300" height="300"></canvas>
+                <div id="response"></div>
+            </div>
+          </div>
+          <br>
+          
+
+        </div>
+        <!-- /.container-fluid -->
+
+        <!-- Sticky Footer -->
+        <footer class="sticky-footer">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright © Your Website 2018</span>
+            </div>
+          </div>
+        </footer>
+		
+		
+		
+		<script>
+		
+		function detectface(){
+
+
+
+        var subscriptionKey = $('#subkey').val();
+        if('' == subscriptionKey){
+            alert('Please Provide valid Subscription Keys.');
+            return;
+        }
+
+        var apiVersion = "v1.0"; //$('#version').val();
+        var serviceFunction = $('#face-function').val();
+        var region =  "westcentralus"; //$('#region').val();
+        var apitype =  "face"; //$('#apitype').val();
+        var reqParam = $('#reqparam').val();
+        var bodyParam = $('#bodyparam').val();
+
+        var bd = JSON.parse(bodyParam);
+
+        //document.getElementById('outputImg').src = apiData.body.url;
+
+        var uriBase =
+            "https://"+region+".api.cognitive.microsoft.com/"+apitype+"/"+apiVersion+"/detect?"+reqParam;
+
+        $.ajax({
+            url: uriBase,
+
+            beforeSend: function(jqXHR) {
+              jqXHR.setRequestHeader("Content-Type", "application/json");
+              jqXHR.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
+            },
+            type: "POST",
+            processData: false,
+            data: bodyParam
+          })
+
+        .done(function(data) {
+            // Show formatted JSON on webpage.
+            processJson(data);
+            
+            var canvas = document.getElementById('outcan');
+            var context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            var imageObj = new Image();
+            imageObj.src = bd.url;
+            imageObj.onload = function() {
+
+                console.log(imageObj);
+                console.log(imageObj.width);
+                console.log(imageObj.height);
+
+                context.drawImage(imageObj, 0, 0,350,300);
+
+                context.beginPath();
+                for(i =0 ;i < data.length; i++){
+                  context.rect(data[i]['faceRectangle']['left']*(350/imageObj.width),
+                              data[i]['faceRectangle']['top']*(300/imageObj.height),
+                              data[i]['faceRectangle']['width']*(350/imageObj.width),
+                              data[i]['faceRectangle']['height']*(300/imageObj.height));
+                }
+                            
+                context.lineWidth = 2;
+                context.stroke();
+            }; 
+
+
+        })
+
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Display error message.
+            var errorString = (errorThrown === "") ? "Error. " :
+                errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ? "" :
+                jQuery.parseJSON(jqXHR.responseText).message;
+            alert(errorString);
+        });
+
+
+    }
+	
+	</script>

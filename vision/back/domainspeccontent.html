@@ -1,0 +1,97 @@
+<div class="container-fluid">
+
+          <!-- Breadcrumbs-->
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#">Get Domain Specific Content</a>
+            </li>
+            <!-- <li class="breadcrumb-item active">Overview</li> -->
+          </ol>
+
+          <!-- Icon Cards-->
+
+          <div class="row">
+            <div class="col-xl-6 col-sm-9 mb-6">
+              
+
+                <!-- <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="name">Subscription Key</label>
+                        <input  class="form-control" value="88e4100823d649138e0cd86d9b16ad0f" type="text" id="subkey" placeholder="Subscription Key">
+                    </div>
+                </div>
+                --> 
+    
+                <div class="col-md-12">
+                    <div class="form-group" id="url1">
+                        <label for="name">URL + Parameter</label>
+                        <textarea class="form-control" style="height:130px"  type="text" id="url" placeholder="">
+https://westus.api.cognitive.microsoft.com/vision/v1.0/models/celebrities/analyze
+                        </textarea>
+                    </div>
+                </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="name">Image URL</label>
+                            <textarea class="form-control" style="height:130px" type="text" id="imgurl" placeholder="">
+https://www.thenews.com.pk//assets/uploads/updates/2018-08-16/356035_4210554_updates.jpg   
+                            </textarea>
+                        </div>
+                    </div>    
+    
+    
+                    <button class="btn btn-secondary col-md-6" style="margin-left: 15px;" type="button" 
+                    onclick="analyzeDsImg()">Analyze Domain Specific Image</button>
+    
+ 
+
+            </div>
+            <div class="col-xl-6 col-sm-9 mb-6">
+                <div id="response"></div>
+            </div>
+          </div>
+          <br>
+          
+
+        </div>
+        <!-- /.container-fluid -->
+
+        <!-- Sticky Footer -->
+        <footer class="sticky-footer">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright © Your Website 2018</span>
+            </div>
+          </div>
+        </footer>
+		
+		
+		
+		<script>
+		
+function analyzeDsImg(){
+
+    var uriBase = $('#url').val();
+    var imgurl = $('#imgurl').val();
+    $.ajax({
+        url: uriBase,
+        beforeSend: function(jqXHR) {
+            jqXHR.setRequestHeader("Content-Type", "application/json");
+            jqXHR.setRequestHeader("Ocp-Apim-Subscription-Key", '961b42406426436d945fb70adb9c37eb');
+        },
+        type: "POST",
+        data: '{"url":"'+imgurl+'"}'
+    }).done(function(data) {
+        processJson(data);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        var errorString = (errorThrown === "") ? "Error. " :
+            errorThrown + " (" + jqXHR.status + "): ";
+        errorString += (jqXHR.responseText === "") ? "" :
+            jQuery.parseJSON(jqXHR.responseText).message;
+        alert(errorString);
+    });
+
+}
+	
+	        </script>
